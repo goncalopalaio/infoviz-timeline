@@ -5,17 +5,20 @@ import threading
 import queue
 import random
 
+
 def log(text):
 	print("log :: %s" % (text))
 
 temp_separation_test = bimpy.Float(0.5)
 
-class MessagePipeline:
+
+class MessagePipeline(object):
 	def __init__(self):
 		# thread safe queue
 		self.queue = queue.Queue(maxsize = 1000)
 		# Event object to notify queue has changed
 		self.event = threading.Event()
+
 
 class Message:
 	def __init__(self):
@@ -23,10 +26,12 @@ class Message:
 		self.text = None
 		self.point = None
 
+
 class Data:
 	def __init__(self):
 		self.text = ""
 		self.points = []
+
 
 def thread_message_consumer_func(data, thread_message_pipeline):
 	log("Starting thread_message_consumer_func")
@@ -118,11 +123,11 @@ def main():
 
 	data = Data()
 
+	
 	thread_message_pipeline = MessagePipeline()
 	thread_message_consumer = threading.Thread(target = thread_message_consumer_func, args = (data, thread_message_pipeline, ))
-	
 	thread_message_consumer.start()
-	
+
 	previous_n_points = 0
 	clear_flag = False
 	while not ctx.should_close():
@@ -138,7 +143,7 @@ def main():
 				send_messages(thread_message_pipeline, temp_messages)
 			
 			if bimpy.button("Send A Lot Of Random Points"):
-				temp_messages = [make_message_point("point", i, i) for i in range(20)]
+				temp_messages = [make_message_point("point", (i, i)) for i in range(20)]
 				send_messages(thread_message_pipeline, temp_messages)				
 			
 			if bimpy.button("Clear Flag"):
